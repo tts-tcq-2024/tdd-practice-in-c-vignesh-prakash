@@ -15,7 +15,7 @@ int add(const char *numbers) {
 
     // Check for custom delimiter
     if (strncmp(numbers, "//", 2) == 0) {
-        char *newline = strchr(numbers, '\n');
+        const char *newline = strchr(numbers, '\n');
         if (newline) {
             char customDelimiter[10]; // Hold the custom delimiter
             size_t delimiterLength = newline - (numbers + 2);
