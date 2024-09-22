@@ -2,35 +2,46 @@
 #include <stdlib.h>
 #include <string.h>
 
-void throwException(char *message) {
+void throwException(const char *message) {
     printf("Exception: %s\n", message);
 }
 
-int add(char *numbers) {
+int add(const char *numbers) {
     if (strcmp(numbers, "") == 0) return 0; // Handle empty string
 
     int total = 0;
-    char *delimiter = ",";
-    char *ptr;
+    const char *delimiter = ",";
+    char *token; // Tokenizer pointer
 
     // Check for custom delimiter
     if (strncmp(numbers, "//", 2) == 0) {
         char *newline = strchr(numbers, '\n');
         if (newline) {
-            *newline = 0; // Temporarily end string
-            delimiter = numbers + 2; // Custom delimiter after "//"
+            char customDelimiter[10]; // Hold the custom delimiter
+            size_t delimiterLength = newline - (numbers + 2);
+            strncpy(customDelimiter, numbers + 2, delimiterLength);
+            customDelimiter[delimiterLength] = '\0'; // Null terminate
+
+            delimiter = customDelimiter; // Set the new delimiter
             numbers = newline + 1; // Move past the line break
         }
     }
 
     // Initialize array for negative numbers
-    int negatives[100];
+    int negatives[100] = {0};
     int negCount = 0;
 
+    // Allocate a modifiable copy of numbers for tokenization
+    char *modifiableNumbers = strdup(numbers); 
+    if (modifiableNumbers == NULL) {
+        throwException("Memory allocation failed");
+        return 0;
+    }
+
     // Tokenize and process the numbers
-    ptr = strtok(numbers, delimiter);
-    while (ptr != NULL) {
-        int n = atoi(ptr); // Convert to integer
+    token = strtok(modifiableNumbers, delimiter);
+    while (token != NULL) {
+        int n = atoi(token); // Convert to integer
 
         // Process the number
         if (n < 0) {
@@ -39,7 +50,7 @@ int add(char *numbers) {
             total += n; // Add to total if valid
         }
 
-        ptr = strtok(NULL, delimiter); // Get the next number
+        token = strtok(NULL, delimiter); // Get the next number
     }
 
     // Handle negatives if any were found
@@ -52,5 +63,6 @@ int add(char *numbers) {
         throwException(msg);
     }
 
+    free(modifiableNumbers); // Free the allocated memory
     return total; // Return the total
 }
