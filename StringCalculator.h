@@ -3,7 +3,7 @@
 #include <string.h>
 
 int add(const char* input) {
- if(input=="0"){
+ if((strcmp(input,"")==0)||(strcmp(input,"0")==0)){
  return 0;
  }
 }
