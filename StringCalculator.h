@@ -6,40 +6,28 @@ void throwException(const char *message) {
     printf("Exception: %s\n", message);
 }
 
-int add(const char *numbers) {
-    if (strcmp(numbers, "") == 0) return 0; // Handle empty string
-
-    int total = 0;
-    const char *delimiter = ",";
-    char *token; // Tokenizer pointer
-
-    // Check for custom delimiter
-    if (strncmp(numbers, "//", 2) == 0) {
-        const char *newline = strchr(numbers, '\n');
+const char* extractDelimiter(const char **numbers) {
+    if (strncmp(*numbers, "//", 2) == 0) {
+        const char *newline = strchr(*numbers, '\n');
         if (newline) {
-            char customDelimiter[10]; // Hold the custom delimiter
-            size_t delimiterLength = newline - (numbers + 2);
-            strncpy(customDelimiter, numbers + 2, delimiterLength);
-            customDelimiter[delimiterLength] = '\0'; // Null terminate
-
-            delimiter = customDelimiter; // Set the new delimiter
-            numbers = newline + 1; // Move past the line break
+            size_t delimiterLength = newline - (*numbers + 2);
+            char *customDelimiter = strndup(*numbers + 2, delimiterLength);
+            if (!customDelimiter) {
+                throwException("Memory allocation failed");
+            }
+            *numbers = newline + 1; // Move past the line break
+            return customDelimiter;
         }
     }
+    return ","; // Return default delimiter
+}
 
-    // Initialize array for negative numbers
+int tokenizeAndSum(char *numbers, const char *delimiter) {
+    int total = 0;
     int negatives[100] = {0};
     int negCount = 0;
+    char *token = strtok(numbers, delimiter);
 
-    // Allocate a modifiable copy of numbers for tokenization
-    char *modifiableNumbers = strdup(numbers); 
-    if (modifiableNumbers == NULL) {
-        throwException("Memory allocation failed");
-        return 0;
-    }
-
-    // Tokenize and process the numbers
-    token = strtok(modifiableNumbers, delimiter);
     while (token != NULL) {
         int n = atoi(token); // Convert to integer
 
@@ -63,6 +51,32 @@ int add(const char *numbers) {
         throwException(msg);
     }
 
+    return total; // Return the total
+}
+
+int add(const char *numbers) {
+    if (strcmp(numbers, "") == 0) return 0; // Handle empty string
+
+    const char *delimiterStr = numbers; // Start with original string
+    char *modifiableNumbers = strdup(numbers); 
+    if (modifiableNumbers == NULL) {
+        throwException("Memory allocation failed");
+        return 0;
+    }
+
+    // Extract delimiter and adjust number string
+    const char *delimiter = extractDelimiter(&delimiterStr);
+    // Tokenize and sum the numbers
+    int total = tokenizeAndSum(modifiableNumbers, delimiter);
+
     free(modifiableNumbers); // Free the allocated memory
     return total; // Return the total
+}
+
+int main() {
+    // Example usage
+    const char *input = "//;\n1;2;3"; // Customize this input for testing
+    int result = add(input);
+    printf("Result: %d\n", result);
+    return 0;
 }
