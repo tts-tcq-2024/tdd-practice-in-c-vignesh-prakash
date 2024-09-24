@@ -6,42 +6,31 @@ void throwException(const char *message) {
     printf("Exception: %s\n", message);
 }
 
+char* extractCustomDelimiter(const char **numbers) {
+    const char *newline = strchr(*numbers, '\n');
+    if (newline) {
+        size_t delimiterLength = newline - (*numbers + 2);
+        char *customDelimiter = strndup(*numbers + 2, delimiterLength);
+        if (!customDelimiter) {
+            throwException("Memory allocation failed");
+        }
+        *numbers = newline + 1; // Move past the line break
+        return customDelimiter;
+    }
+    return NULL;
+}
+
 const char* extractDelimiter(const char **numbers) {
     if (strncmp(*numbers, "//", 2) == 0) {
-        const char *newline = strchr(*numbers, '\n');
-        if (newline) {
-            size_t delimiterLength = newline - (*numbers + 2);
-            char *customDelimiter = strndup(*numbers + 2, delimiterLength);
-            if (!customDelimiter) {
-                throwException("Memory allocation failed");
-            }
-            *numbers = newline + 1; // Move past the line break
+        char *customDelimiter = extractCustomDelimiter(numbers);
+        if (customDelimiter) {
             return customDelimiter;
         }
     }
     return ","; // Return default delimiter
 }
 
-int tokenizeAndSum(char *numbers, const char *delimiter) {
-    int total = 0;
-    int negatives[100] = {0};
-    int negCount = 0;
-    char *token = strtok(numbers, delimiter);
-
-    while (token != NULL) {
-        int n = atoi(token); // Convert to integer
-
-        // Process the number
-        if (n < 0) {
-            negatives[negCount++] = n; // Store negative number
-        } else if (n <= 1000) { 
-            total += n; // Add to total if valid
-        }
-
-        token = strtok(NULL, delimiter); // Get the next number
-    }
-
-    // Handle negatives if any were found
+void handleNegatives(int *negatives, int negCount) {
     if (negCount > 0) {
         char msg[256];
         sprintf(msg, "negatives not allowed: ");
@@ -50,7 +39,29 @@ int tokenizeAndSum(char *numbers, const char *delimiter) {
         }
         throwException(msg);
     }
+}
 
+int processNumber(const char *token, int *negatives, int *negCount) {
+    int n = atoi(token); // Convert to integer
+    if (n < 0) {
+        negatives[(*negCount)++] = n; // Store negative number
+        return 0;
+    }
+    return (n <= 1000) ? n : 0; // Return the number if valid, else return 0
+}
+
+int tokenizeAndSum(char *numbers, const char *delimiter) {
+    int total = 0;
+    int negatives[100] = {0};
+    int negCount = 0;
+
+    char *token = strtok(numbers, delimiter);
+    while (token != NULL) {
+        total += processNumber(token, negatives, &negCount);
+        token = strtok(NULL, delimiter); // Get the next number
+    }
+
+    handleNegatives(negatives, negCount); // Handle negatives if any were found
     return total; // Return the total
 }
 
@@ -71,12 +82,4 @@ int add(const char *numbers) {
 
     free(modifiableNumbers); // Free the allocated memory
     return total; // Return the total
-}
-
-int main() {
-    // Example usage
-    const char *input = "//;\n1;2;3"; // Customize this input for testing
-    int result = add(input);
-    printf("Result: %d\n", result);
-    return 0;
 }
