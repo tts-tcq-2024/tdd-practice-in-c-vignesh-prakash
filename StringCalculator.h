@@ -30,14 +30,26 @@ const char* extractDelimiter(const char **numbers) {
     return ","; // Return default delimiter
 }
 
+char* constructNegativeMessage(int *negatives, int negCount) {
+    char *msg = malloc(256); // Allocate memory for the message
+    if (!msg) {
+        throwException("Memory allocation failed");
+        return NULL;
+    }
+    sprintf(msg, "negatives not allowed: ");
+    for (int i = 0; i < negCount; i++) {
+        sprintf(msg + strlen(msg), "%d%s", negatives[i], (i == negCount - 1) ? "" : ", ");
+    }
+    return msg; // Return constructed message
+}
+
 void handleNegatives(int *negatives, int negCount) {
     if (negCount > 0) {
-        char msg[256];
-        sprintf(msg, "negatives not allowed: ");
-        for (int i = 0; i < negCount; i++) {
-            sprintf(msg + strlen(msg), "%d%s", negatives[i], (i == negCount - 1) ? "" : ", ");
+        char *msg = constructNegativeMessage(negatives, negCount);
+        if (msg) {
+            throwException(msg);
+            free(msg); // Free the allocated message
         }
-        throwException(msg);
     }
 }
 
