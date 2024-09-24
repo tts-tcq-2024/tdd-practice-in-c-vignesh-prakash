@@ -45,7 +45,7 @@ const char* extractDelimiter(const char **numbers) {
             return customDelimiter;
         }
     }
-    return ","; // Return default delimiter
+    return ",\n"; // Add newline as a default delimiter
 }
 
 int processNumber(const char *token, int *negatives, int *negCount) {
