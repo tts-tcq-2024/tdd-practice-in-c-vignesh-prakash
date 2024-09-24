@@ -2,8 +2,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_NEGATIVES 100
+#define MSG_SIZE 256
+
 void throwException(const char *message) {
     printf("Exception: %s\n", message);
+}
+
+void constructNegativeMessage(int *negatives, int negCount, char *msg) {
+    sprintf(msg, "negatives not allowed: ");
+    for (int i = 0; i < negCount; i++) {
+        sprintf(msg + strlen(msg), "%d%s", negatives[i], (i == negCount - 1) ? "" : ", ");
+    }
+}
+
+void handleNegatives(int *negatives, int negCount) {
+    if (negCount > 0) {
+        char msg[MSG_SIZE]; // Use a fixed-size buffer
+        constructNegativeMessage(negatives, negCount, msg);
+        throwException(msg);
+    }
 }
 
 char* extractCustomDelimiter(const char **numbers) {
@@ -30,29 +48,6 @@ const char* extractDelimiter(const char **numbers) {
     return ","; // Return default delimiter
 }
 
-char* constructNegativeMessage(int *negatives, int negCount) {
-    char *msg = malloc(256); // Allocate memory for the message
-    if (!msg) {
-        throwException("Memory allocation failed");
-        return NULL;
-    }
-    sprintf(msg, "negatives not allowed: ");
-    for (int i = 0; i < negCount; i++) {
-        sprintf(msg + strlen(msg), "%d%s", negatives[i], (i == negCount - 1) ? "" : ", ");
-    }
-    return msg; // Return constructed message
-}
-
-void handleNegatives(int *negatives, int negCount) {
-    if (negCount > 0) {
-        char *msg = constructNegativeMessage(negatives, negCount);
-        if (msg) {
-            throwException(msg);
-            free(msg); // Free the allocated message
-        }
-    }
-}
-
 int processNumber(const char *token, int *negatives, int *negCount) {
     int n = atoi(token); // Convert to integer
     if (n < 0) {
@@ -64,7 +59,7 @@ int processNumber(const char *token, int *negatives, int *negCount) {
 
 int tokenizeAndSum(char *numbers, const char *delimiter) {
     int total = 0;
-    int negatives[100] = {0};
+    int negatives[MAX_NEGATIVES] = {0};
     int negCount = 0;
 
     char *token = strtok(numbers, delimiter);
@@ -81,7 +76,7 @@ int add(const char *numbers) {
     if (strcmp(numbers, "") == 0) return 0; // Handle empty string
 
     const char *delimiterStr = numbers; // Start with original string
-    char *modifiableNumbers = strdup(numbers); 
+    char *modifiableNumbers = strdup(numbers);
     if (modifiableNumbers == NULL) {
         throwException("Memory allocation failed");
         return 0;
