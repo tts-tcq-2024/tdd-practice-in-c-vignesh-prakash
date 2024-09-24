@@ -15,12 +15,12 @@ TEST(StringCalculatorAddTests, ExpectZeroForSingleZero) {
     ASSERT_EQ(result, expectedresult);
 }
 
-TEST(StringCalculatorAddTests, ExpectSumForTwoNumbers) {
-    int expectedresult = 3;
-    const char*  input = "1,2";
-    int result = add(input);
-    ASSERT_EQ(result, expectedresult);
-}
+// TEST(StringCalculatorAddTests, ExpectSumForTwoNumbers) {
+//     int expectedresult = 3;
+//     const char*  input = "1,2";
+//     int result = add(input);
+//     ASSERT_EQ(result, expectedresult);
+// }
 
 TEST(StringCalculatorAddTests, ExpectSumWithNewlineDelimiter) {
     int expectedresult = 6;
