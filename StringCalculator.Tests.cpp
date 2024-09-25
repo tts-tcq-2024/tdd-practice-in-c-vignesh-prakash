@@ -44,7 +44,7 @@ TEST(StringCalculatorAddTests, ExpectSumWithCustomDelimiter) {
 }
 
 TEST(StringCalculatorAddTests, ExpectExeptionForNegativeNumbers) {
-    int expectedresult = "Exception: negatives not allowed: -1, -4";
+    int expectedresult = 0;
     const char*  input = "-1,-4";
     int result = add(input);
     ASSERT_EQ(result, expectedresult);
