@@ -56,3 +56,10 @@ TEST(StringCalculatorAddTests, ExpectSumOfNumbersEqualto1000) {
     int result = add(input);
     ASSERT_EQ(result, expectedresult);
 }
+
+TEST(StringCalculatorAddTests, ExpectSumOfNumbersEqualto1000) {
+    int expectedresult = 21;
+    const char*  input = "1,9,4,7";
+    int result = add(input);
+    ASSERT_EQ(result, expectedresult);
+}
