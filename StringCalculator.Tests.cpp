@@ -57,9 +57,16 @@ TEST(StringCalculatorAddTests, ExpectSumOfNumbersEqualto1000) {
     ASSERT_EQ(result, expectedresult);
 }
 
-TEST(StringCalculatorAddTests, ExpectSumOfNumbersEqualto1000) {
+TEST(StringCalculatorAddTests, ExpectSumOfMultipleInputs) {
     int expectedresult = 21;
     const char*  input = "1,9,4,7";
+    int result = add(input);
+    ASSERT_EQ(result, expectedresult);
+}
+
+TEST(StringCalculatorAddTests, IgnoreOnlyDelimiterWithoutNumbers) {
+    int expectedresult = 0;
+    const char*  input = "//,#,#,/n";
     int result = add(input);
     ASSERT_EQ(result, expectedresult);
 }
