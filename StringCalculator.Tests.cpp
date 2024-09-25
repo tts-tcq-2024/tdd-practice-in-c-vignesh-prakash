@@ -49,3 +49,10 @@ TEST(StringCalculatorAddTests, ExpectExeptionForNegativeNumbers) {
     int result = add(input);
     ASSERT_EQ(result, expectedresult);
 }
+
+TEST(StringCalculatorAddTests, ExpectSumOfNumbersEqualto1000) {
+    int expectedresult = 1999;
+    const char*  input = "999,1000";
+    int result = add(input);
+    ASSERT_EQ(result, expectedresult);
+}
